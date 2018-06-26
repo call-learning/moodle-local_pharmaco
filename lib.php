@@ -11,3 +11,4 @@ global $CFG;
 
 define('ENVA_EXTERNAL_ROLE_SHORTNAME','ENVA-EXT');
 define('ENVA_EXTERNAL_ROLE_ARCHETYPE','student');
+define('ENVA_EXTERNAL_COURSE_TAG_NAME','external_course');

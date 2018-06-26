@@ -53,3 +53,11 @@ function create_external_training_role() {
     }
     return true;
 }
+
+/**
+ * Create a new tag if it does not exist. The purpose of this tag is to
+ * mark courses as courses for external people (8 courses normally)
+ */
+function create_external_tag() {
+
+}
