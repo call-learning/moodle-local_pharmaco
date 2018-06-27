@@ -57,7 +57,11 @@ function create_external_training_role() {
 /**
  * Create a new tag if it does not exist. The purpose of this tag is to
  * mark courses as courses for external people (8 courses normally)
+ * This will be part of the default tag collection
  */
 function create_external_tag() {
-
+    global $DB;
+    
+    core_tag_tag::create_if_missing(core_tag_collection::get_default(),array(ENVA_EXTERNAL_COURSE_TAG_NAME),true);
+    return true;
 }

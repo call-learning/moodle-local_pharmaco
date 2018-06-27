@@ -6,7 +6,7 @@ global $CFG;
 require_once($CFG->dirroot.'/local/enva/locallib.php');
 
 
-class local_enva_role_test extends advanced_testcase {
+class local_enva_setup_testcase extends advanced_testcase {
 	
     /*
      * Test the role creation / update

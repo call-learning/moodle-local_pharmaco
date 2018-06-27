@@ -35,12 +35,35 @@ defined('MOODLE_INTERNAL') || die();
 class external_courses {
     private $externalcoursetag;
     
-    function __construct(string $externalcoursetag) {
+    /**
+     * External_courses constructor.
+     * We provide the tag as parameter so we are not dependent on the value here
+     * @param string $externalcoursetag
+     */
+    public function __construct(string $externalcoursetag) {
         $this->externalcoursetag = $externalcoursetag;
     }
-    
-    function get_external_courses_list() {
-        courseca
+    /**
+     * Get the list of all course tagged as external courses
+     */
+    public function get_external_courses_list() {
+        $tagobject = \core_tag_tag::get_by_name(\core_tag_collection::get_default(), $this->externalcoursetag);
+        return $tagobject->get_tagged_items('core','course');
+    }
+    /**
+     * Register given user to the external courses
+     */
+    public function enrol_user_into_external_courses($userid) {
+        global $CFG;
+        include_once($CFG->libdir.'/enrollib.php');
+        
+        $courselist = $this->get_external_courses_list();
+        foreach( $courselist as $course ) {
+            $context = context_course::instance($course->id);
+            if ( !is_enrolled($context,$userid) ) {
+                enrol_try_internal_enrol($course->id, $userid);
+            }
+        }
     }
 
 }
