@@ -30,12 +30,11 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-
 /**
  * This class contains the test cases for the tag_score class
  *
  */
-class local_enva_tag_scores_testcase extends advanced_testcase {
+class local_enva_tag_scores_testcase extends \local_enva\quiz_test_base {
     
     
     public function test_tagged_simple_quiz_results() {
@@ -46,10 +45,24 @@ class local_enva_tag_scores_testcase extends advanced_testcase {
         $ts = new \local_enva\tag_scores($course->id, $user->id);
         $table = $ts->compute();
         $this->assertSame(array (
-            'délivrance' => 4.0,
-            'prescription' => 4.0,
+            'délivrance' => 1.0,
+            'prescription' => 1.0,
         ),$table);
     }
+    
+    public function test_tagged_simple_quiz_results_with_failures() {
+        // We assume we have one course and one user
+        $this->resetAfterTest();
+        list ($user, $course) =
+            $this->create_tagged_courses_and_quizes(8,1,array('délivrance','prescription'),2);
+        $ts = new \local_enva\tag_scores($course->id, $user->id);
+        $table = $ts->compute();
+        $this->assertSame(array (
+            'délivrance' => 0.875,
+            'prescription' => 0.875,
+        ),$table);
+    }
+
     
     public function test_tagged_several_quiz_results() {
         // We assume we have one course and one user
@@ -59,13 +72,13 @@ class local_enva_tag_scores_testcase extends advanced_testcase {
         $ts = new \local_enva\tag_scores($course->id, $user->id);
         $table = $ts->compute();
         $this->assertSame(array (
-            'délivrance' => 15.0,
-            'prescription' => 15.0,
-            'stupéfiant' => 10.0,
+            'délivrance' => 1.0,
+            'prescription' => 1.0,
+            'stupéfiant' => 1.0,
         ),$table);
     }
     
-    protected function create_tagged_courses_and_quizes($num_questions_per_quiz, $num_quizzes, $tagnames ) {
+    protected function create_tagged_courses_and_quizes($num_questions_per_quiz, $num_quizzes, $tagnames,$numberfailuresperquiz = 0 ) {
     
         // Create a user
         $user = $this->getDataGenerator()->create_user();
@@ -76,53 +89,54 @@ class local_enva_tag_scores_testcase extends advanced_testcase {
         // Enroll user in the course
         enrol_try_internal_enrol($course->id, $user->id);
         for($quizn = 0; $quizn < $num_quizzes; $quizn++) {
-            $this->create_tagged_quizzes($num_questions_per_quiz, $tagnames, $user, $course);
+            $this->create_tagged_quizzes($num_questions_per_quiz, $tagnames, $user, $course,$numberfailuresperquiz);
         }
        
         return array($user,$course);
     }
-    protected function create_tagged_quizzes($num_questions_per_quiz, $tagnames, $user, $course ) {
-        $timenow = time(); // Update time now, in case the server is running really slowly.
-        // Create the quizzes
-    
-        $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
-        $quiz = $quizgenerator->create_instance(array('course' => $course->id, 'questionsperpage' => 0,
-            'grade' => 100.0, 'sumgrades' => 2, 'preferredbehaviour' => 'immediatefeedback'));
-        $cm = get_coursemodule_from_instance('quiz', $quiz->id);
-        // Create the questions.
-        $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $cat = $generator->create_question_category();
-        $questions = array();
-        for ($i = 0; $i < $num_questions_per_quiz ; $i++) {
-            $sa = $generator->create_question('shortanswer', null, array('category' => $cat->id));
-            $tagname =  $tagnames[$i % count($tagnames)];
-            
-            // Add the tag to the question
-            core_tag_tag::add_item_tag('core_question', 'question', $sa->id,
-                context::instance_by_id($cat->contextid), $tagname);
-            $questions[] = $sa;
-            // Add the question to the quiz
-            quiz_add_quiz_question($sa->id, $quiz);
-        }
-        /* Create the helper objects */
-        $quizobj = new quiz($quiz, $cm, $course);
-        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
-        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
-    
-        // Create and save the quiz attempt
-        $quizattempt = quiz_create_attempt($quizobj, 1, null, $timenow, false, $user->id);
-        $quizattempt = quiz_start_new_attempt($quizobj, $quba, $quizattempt, 1, $timenow);
-        $quizattempt = quiz_attempt_save_started($quizobj, $quba, $quizattempt); // Save attempt and get a unique id
-        // Answer all questions right
-        $quizattemptobj = quiz_attempt::create($quizattempt->id);
-        $slottableresponses = [];
-        foreach ($quba->get_slots() as $slot) {
-            $correctresponse = $quba->get_correct_response($slot);
-            $slottableresponses[$slot] = $correctresponse;
-        }
-        $quizattemptobj->process_submitted_actions($timenow + 300, false, $slottableresponses);
-        $quizattemptobj->process_finish($timenow + 600, false);
-        $quizattemptobj->process_finish($timenow, false); // Save quiz + question states
-    
-    }
 }
+/*
+SELECT
+    quba.id AS qubaid,
+    quba.contextid,
+    quba.component,
+    quba.preferredbehaviour,
+    qa.id AS questionattemptid,
+    qa.questionusageid,
+    qa.slot,
+    qa.behaviour,
+    qa.questionid,
+    qa.variant,
+    qa.maxmark,
+    qa.minfraction,
+    qa.maxfraction,
+    qa.flagged,
+    qa.questionsummary,
+    qa.rightanswer,
+    qa.responsesummary,
+    qa.timemodified,
+    qas.id AS attemptstepid,
+    qas.sequencenumber,
+    qas.state,
+    qas.fraction,
+    qas.timecreated,
+    qas.userid,
+    qasd.name,
+    qasd.value
+
+FROM      mdl_question_usages            quba
+LEFT JOIN mdl_question_attempts          qa   ON qa.questionusageid    = quba.id
+LEFT JOIN mdl_question_attempt_steps     qas  ON qas.questionattemptid = qa.id
+LEFT JOIN mdl_question_attempt_step_data qasd ON qasd.attemptstepid    = qas.id
+
+WHERE
+    quba.id IN (SELECT quiza.uniqueid FROM mdl_quiz_attempts quiza WHERE quiza.quiz = 7 AND quiza.userid = 2 AND preview = 0 AND state IN ('finished', 'abandonned'))
+
+ORDER BY
+    quba.id,
+    qa.slot,
+    qas.sequencenumber
+ 
+
+
+ */

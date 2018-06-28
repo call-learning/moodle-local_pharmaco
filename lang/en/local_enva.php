@@ -15,3 +15,8 @@ before starting';
 $string['envasettings'] = 'ENVA Local Plugin Settings';
 $string['setting:coursetocomplete'] = 'Course to complete';
 $string['setting:coursetocomplete_desc'] = 'Course to complete before, in order to be registered to all external courses';
+
+
+// CRON
+
+$string['registerusersintest'] = 'Register users in test course';

@@ -30,7 +30,9 @@ namespace local_enva;
 use mod_quiz\question\qubaids_for_users_attempts;
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
+include_once ($CFG->dirroot.'/question/engine/lib.php');
+include_once ($CFG->dirroot.'/mod/quiz/locallib.php');
 /**
  *  Class to build an array of tags vs scores for a given course
  *  We check in every quiz of the course what is the score and we match it to the tags for each quiz
@@ -46,6 +48,7 @@ class tag_scores {
     }
     /**
      * Get a list of tag and their matching score for a given user/course
+     * @return an associative array with the tag rawname and the score as an average percentage scored for this tag
      */
     public function compute() {
         $modinfo = \course_modinfo::instance($this->courseid,$this->userid);
@@ -67,11 +70,18 @@ class tag_scores {
                     $question = $qa->get_question();
                     $tagarray = \core_tag_tag::get_item_tags('core_question', 'question', $question->id);
                     $tag = reset($tagarray);
-                    $mark = $quba->get_question_mark($qa->get_slot());
-                    if (empty($tagtable[$tag->rawname])) {
-                        $tagtable[$tag->rawname] = 0;
+                    if ($tag) {
+                        $mark = $quba->get_question_mark($qa->get_slot());
+                        $maxmark = $quba->get_question_max_mark($qa->get_slot());
+                        if ($maxmark > 0) {
+                            $markpercent = $mark / $maxmark;
+                            if (!isset($tagtable[$tag->rawname])) {
+                                $tagtable[$tag->rawname] = $markpercent;
+                            } else {
+                                $tagtable[$tag->rawname] = ($tagtable[$tag->rawname] + $markpercent) / 2;
+                            }
+                        }
                     }
-                    $tagtable[$tag->rawname] += $mark;
                 }
             }
         }

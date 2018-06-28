@@ -36,7 +36,7 @@ class course_completion_observer {
      */
     static public function completed(\core\event\course_completed $event) {
         $eventdata = $event->get_record_snapshot('course_completions', $event->objectid);
-        $selcourseid = get_config('local_enva', 'coursetocomplete');
+        $selcourseid = helper::get_test_course_id();
         if ($eventdata->course == $selcourseid) {
             // If the current user completed the test course, try to register to the other external courses
             user_registration::register_user_to_external_courses($eventdata->userid);

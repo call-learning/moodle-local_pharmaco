@@ -29,6 +29,8 @@
 namespace local_enva;
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+include_once($CFG->dirroot . '/local/enva/lib.php');
 /**
  * Class user_registration: manages all aspect of External user registration in courses
  * @package local_enva
@@ -49,14 +51,16 @@ class user_registration {
             return;
         }
         // First, get the "selection"/quiz courseid
-        $selcourseid = get_config('local_enva','coursetocomplete');
+        $selcourseid = helper::get_test_course_id();
         if ( $selcourseid ) {
-            $isexternaluser = user_registration::is_user_external_role($event->relateduserid);
+            $isexternaluser = helper::is_user_external_role($event->relateduserid);
             if ($isexternaluser) {
                 global $CFG;
                 $context = \context_course::instance($selcourseid);
                 if ( !is_enrolled($context,$event->relateduserid) ) {
-                    enrol_try_internal_enrol($selcourseid, $event->relateduserid);
+                    $studentroleid = $DB->get_field('role','id',array ('shortname' => 'student'));
+                    // This is required for the completion module: the user should be a student
+                    enrol_try_internal_enrol($selcourseid, $event->relateduserid,$studentroleid);
                 }
             }
         }
@@ -68,13 +72,11 @@ class user_registration {
      * @param $userid
      */
     static public function register_user_to_external_courses($userid) {
-        $isexternaluser = user_registration::is_user_external_role($userid);
+        $isexternaluser = helper::is_user_external_role($userid);
     
         // Here we enrol the user onto the external courses
         // First, get the "selection"/quiz courseid
         if ( $isexternaluser ) {
-            global $CFG;
-            include_once($CFG->dirroot . '/local/enva/lib.php');
             $extcourses = new \local_enva\external_courses(ENVA_EXTERNAL_COURSE_TAG_NAME);
             $extcourses->enrol_user_into_external_courses($userid);
         }
