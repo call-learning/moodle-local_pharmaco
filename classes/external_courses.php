@@ -59,7 +59,7 @@ class external_courses {
         
         $courselist = $this->get_external_courses_list();
         foreach( $courselist as $course ) {
-            $context = context_course::instance($course->id);
+            $context = \context_course::instance($course->id);
             if ( !is_enrolled($context,$userid) ) {
                 enrol_try_internal_enrol($course->id, $userid);
             }

@@ -9,6 +9,10 @@
 $observers = array (
     array (
         'eventname' =>'\core\event\course_completed',
-        'callback' => '\local\course_completion::completed',
+        'callback' => '\local_enva\course_completion_observer::completed',
+    ),
+    array (
+        'eventname' =>'\core\event\role_assigned',
+        'callback' => '\local_enva\user_registration::register_to_test_course',
     )
 );

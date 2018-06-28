@@ -35,11 +35,11 @@ require_once($CFG->dirroot.'/local/enva/locallib.php');
  * This class contains the test cases for the tag_score class
  *
  */
-class local_user_registration_testcase extends advanced_testcase {
+class local_course_completion_observer_testcase extends advanced_testcase {
     
     const MAX_COURSES = 8;
     
-    public function test_user_assigned_to_external_role() {
+    public function test_user_completed_course() {
         global $DB;
         // We assume we have one course and one user
         $this->resetAfterTest();
@@ -53,34 +53,25 @@ class local_user_registration_testcase extends advanced_testcase {
         $externalroleid = $DB->get_field('role','id',array ('shortname' => ENVA_EXTERNAL_ROLE_SHORTNAME));
         role_assign($externalroleid,$user->id,context_system::instance()); // Should trigger the test course assignment
         $context = context_course::instance($course->id);
-        $this->assertTrue(is_enrolled($context,$user->id));
-        
-    }
-    
-    public function test_user_register_to_external_courses() {
-        global $DB;
-        // We assume we have one course and one user
-        $this->resetAfterTest();
-        // Create a user
-        $user = $this->getDataGenerator()->create_user();
-        $courses = [];
+        // Create external courses
+        $externalcourses = [];
         // Create a courses.
         for($i = 0; $i < self::MAX_COURSES; $i++)  {
             $c =  $this->getDataGenerator()->create_course();
             core_tag_tag::add_item_tag('core', 'course', $c->id,
                 context_course::instance($c->id), ENVA_EXTERNAL_COURSE_TAG_NAME); // Tag courses as if external
-            $courses[] = $c;
+            $externalcourses[] = $c;
         }
-    
-        $externalroleid = $DB->get_field('role','id',array ('shortname' => ENVA_EXTERNAL_ROLE_SHORTNAME));
-        role_assign($externalroleid,$user->id,context_system::instance()); // Should trigger the test course assignment
         
-        \local_enva\user_registration::register_user_to_external_courses($user->id);
+        //  Now let's complete this course
+        $ccompletion = new completion_completion(array('course' => $course->id, 'userid' => $user->id));
+        $ccompletion->mark_complete(time());
         
-        foreach($courses as $c) {
+        // User should now be registered in the courses tagged as external
+        foreach($externalcourses as $c) {
             $context = context_course::instance($c->id);
             $this->assertTrue(is_enrolled($context, $user->id));
         }
-        
+    
     }
 }

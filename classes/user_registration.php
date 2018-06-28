@@ -29,38 +29,70 @@
 namespace local_enva;
 defined('MOODLE_INTERNAL') || die();
 
-class course_completion_observer {
+/**
+ * Class user_registration: manages all aspect of External user registration in courses
+ * @package local_enva
+ */
+class user_registration {
     /**
-     * Check if the selection course has been completed. If it has been completed
-     * by an external user (belongs to the EXTERNAL role) then, we enroll him/her into the 8 courses
+     * If the user has been assigned to an external role, then register this user onto the test course
+     * @param \core\event\role_assigned $event
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function completed( \core\event\course_completed $event ) {
-        $eventdata = $event->get_record_snapshot('course_modules_completion', $event->objectid);
-        $eventdata->courseid;
-        $eventdata->context;
-        $eventdata->relateduserid;
-        // Here we enrol the user onto the external courses
-        
+    static public function register_to_test_course( \core\event\role_assigned $event ) {
+        global $DB;
+        $eventdata = $event->get_record_snapshot('role_assignments', $event->other['id']);
+        // Check if the assigned role is the external role, if not ignore the rest of the process
+        $externalroleid = $DB->get_field('role','id',array ('shortname' => ENVA_EXTERNAL_ROLE_SHORTNAME));
+        if ($externalroleid != $eventdata->roleid) {
+            return;
+        }
         // First, get the "selection"/quiz courseid
         $selcourseid = get_config('local_enva','coursetocomplete');
-        if ( $eventdata->courseid == $selcourseid ) {
-            // Check if user has been given the external role, if not do nothing
-            $userroles = get_user_roles(\context_system::instance(), $eventdata->relateduserid);
-            $isinrole = false;
-            foreach($userroles as $r) {
-                if ($r->shortname == ENVA_EXTERNAL_ROLE_SHORTNAME) {
-                    $isinrole = true;
-                    break;
+        if ( $selcourseid ) {
+            $isexternaluser = user_registration::is_user_external_role($event->relateduserid);
+            if ($isexternaluser) {
+                global $CFG;
+                $context = \context_course::instance($selcourseid);
+                if ( !is_enrolled($context,$event->relateduserid) ) {
+                    enrol_try_internal_enrol($selcourseid, $event->relateduserid);
                 }
             }
-            if ($isinrole) {
-                global $CFG;
-                include_once($CFG->dirroot.'/local/enva/lib.php');
-                $extcourses = new \local_enva\external_courses(ENVA_EXTERNAL_COURSE_TAG_NAME);
-                $extcourses->enrol_user_into_external_courses($eventdata->relateduserid);
-            }
-
         }
     }
-
+    
+    /**
+     * Register user to external courses (courses tagged with the external tag) if this user is an
+     * external user
+     * @param $userid
+     */
+    static public function register_user_to_external_courses($userid) {
+        $isexternaluser = user_registration::is_user_external_role($userid);
+    
+        // Here we enrol the user onto the external courses
+        // First, get the "selection"/quiz courseid
+        if ( $isexternaluser ) {
+            global $CFG;
+            include_once($CFG->dirroot . '/local/enva/lib.php');
+            $extcourses = new \local_enva\external_courses(ENVA_EXTERNAL_COURSE_TAG_NAME);
+            $extcourses->enrol_user_into_external_courses($userid);
+        }
+    }
+    
+    /**
+     * Utility function to check if the provided user is an external user
+     * @param $userid
+     * @return bool
+     * @throws \dml_exception
+     */
+    static public function is_user_external_role($userid) {
+        $userroles = get_user_roles(\context_system::instance(), $userid);
+        foreach($userroles as $r) {
+            if ($r->shortname == ENVA_EXTERNAL_ROLE_SHORTNAME) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

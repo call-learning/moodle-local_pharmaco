@@ -14,7 +14,6 @@ function xmldb_local_enva_install() {
     
     $dbman   = $DB->get_manager(); // Loads ddl manager and xmldb classes.
     $success = true;
-    $success = create_external_training_role();
-    $success = create_external_tag();
+    $success = enva_setups();
     return $success;
 }

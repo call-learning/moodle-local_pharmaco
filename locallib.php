@@ -21,7 +21,6 @@ function create_external_training_role() {
     global $DB;
     // Create role if it does not exist already
     $externalroleid = $DB->get_field('role','id',array ('shortname' => ENVA_EXTERNAL_ROLE_SHORTNAME));
-    $rolearchetype = 'student';
     
     if (! $externalroleid )
     {
@@ -64,4 +63,15 @@ function create_external_tag() {
     
     core_tag_tag::create_if_missing(core_tag_collection::get_default(),array(ENVA_EXTERNAL_COURSE_TAG_NAME),true);
     return true;
+}
+
+function setup_preferences() {
+    set_config("defaulthomepage", HOMEPAGE_MY);
+    set_config("enablecompletion", 1, "moodlecourse");
+    set_config("enablecompletion", 1);
+    return true;
+}
+
+function enva_setups() {
+    return create_external_tag() && create_external_training_role() && setup_preferences();
 }

@@ -34,33 +34,15 @@ class course_completion_observer {
      * Check if the selection course has been completed. If it has been completed
      * by an external user (belongs to the EXTERNAL role) then, we enroll him/her into the 8 courses
      */
-    public function completed( \core\event\course_completed $event ) {
-        $eventdata = $event->get_record_snapshot('course_modules_completion', $event->objectid);
-        $eventdata->courseid;
-        $eventdata->context;
-        $eventdata->relateduserid;
-        // Here we enrol the user onto the external courses
-        
-        // First, get the "selection"/quiz courseid
-        $selcourseid = get_config('local_enva','coursetocomplete');
-        if ( $eventdata->courseid == $selcourseid ) {
-            // Check if user has been given the external role, if not do nothing
-            $userroles = get_user_roles(\context_system::instance(), $eventdata->relateduserid);
-            $isinrole = false;
-            foreach($userroles as $r) {
-                if ($r->shortname == ENVA_EXTERNAL_ROLE_SHORTNAME) {
-                    $isinrole = true;
-                    break;
-                }
-            }
-            if ($isinrole) {
-                global $CFG;
-                include_once($CFG->dirroot.'/local/enva/lib.php');
-                $extcourses = new \local_enva\external_courses(ENVA_EXTERNAL_COURSE_TAG_NAME);
-                $extcourses->enrol_user_into_external_courses($eventdata->relateduserid);
-            }
-
+    static public function completed(\core\event\course_completed $event) {
+        $eventdata = $event->get_record_snapshot('course_completions', $event->objectid);
+        $selcourseid = get_config('local_enva', 'coursetocomplete');
+        if ($eventdata->course == $selcourseid) {
+            // If the current user completed the test course, try to register to the other external courses
+            user_registration::register_user_to_external_courses($eventdata->userid);
         }
+        
+        
     }
-
+    
 }
