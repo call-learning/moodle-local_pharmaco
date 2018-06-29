@@ -72,7 +72,7 @@ class tag_scores {
                     $tag = reset($tagarray);
                     if ($tag) {
                         $mark = $quba->get_question_mark($qa->get_slot());
-                        $maxmark = $quba->get_question_max_mark($qa->get_slot());
+                        $maxmark = $quba->get_question_fraction($qa->get_slot())* $quba->get_question_max_mark($qa->get_slot());
                         if ($maxmark > 0) {
                             $markpercent = $mark / $maxmark;
                             if (!isset($tagtable[$tag->rawname])) {
