@@ -71,15 +71,11 @@ class tag_scores {
                     $tagarray = \core_tag_tag::get_item_tags('core_question', 'question', $question->id);
                     $tag = reset($tagarray);
                     if ($tag) {
-                        $mark = $quba->get_question_mark($qa->get_slot());
-                        $maxmark = $quba->get_question_fraction($qa->get_slot())* $quba->get_question_max_mark($qa->get_slot());
-                        if ($maxmark > 0) {
-                            $markpercent = $mark / $maxmark;
-                            if (!isset($tagtable[$tag->rawname])) {
-                                $tagtable[$tag->rawname] = $markpercent;
-                            } else {
-                                $tagtable[$tag->rawname] = ($tagtable[$tag->rawname] + $markpercent) / 2;
-                            }
+                        $markpercent = $quba->get_question_fraction($qa->get_slot()); // Question fraction is REAL percentage
+                        if (!isset($tagtable[$tag->rawname])) {
+                            $tagtable[$tag->rawname] = $markpercent;
+                        } else {
+                            $tagtable[$tag->rawname] = ($tagtable[$tag->rawname] + $markpercent) / 2;
                         }
                     }
                 }
