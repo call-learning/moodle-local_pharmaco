@@ -12,7 +12,7 @@ $string['envaexternalrole_desc'] = 'ENVA External Role, used mainly to decide if
 before starting';
 
 // Settings string
-$string['envasettings'] = 'ENVA Local Plugin Settings';
+$string['envasettings'] = 'ENVA Settings';
 $string['setting:coursetocomplete'] = 'Course to complete';
 $string['setting:coursetocomplete_desc'] = 'Course to complete before, in order to be registered to all external courses';
 

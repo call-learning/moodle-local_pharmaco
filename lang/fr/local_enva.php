@@ -12,7 +12,7 @@ $string['envaexternalrole_desc'] = 'ENVA Rôle Externe, utilisé principalement 
 un examen avant de démarrer les cours';
 
 // Settings string
-$string['envasettings'] = 'Paramètres ENVA Plugin local';
+$string['envasettings'] = 'Paramètres ENVA';
 $string['setting:coursetocomplete'] = 'Cours à compléter';
 $string['setting:coursetocomplete_desc'] = 'Cours à compléter à priori, de manière à être inscrit tous les cours
 destinés au personnes externes';
