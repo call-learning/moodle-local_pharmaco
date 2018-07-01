@@ -66,11 +66,11 @@ class local_enva_course_list_by_score_testcase extends \local_enva\quiz_test_bas
         }
         
         $tag_scores = array(
-            'délivrance' => 0.2,
-            'prescription' => 0.3,
-            'élimination_des_déchets' => 1.0,
-            'pharmacovigilance' => 0.5,
-            'preparation_extemporannées' => 0.0
+            'délivrance' => array ('mark' => 2.0, 'maxmark'=> 10.0),
+            'prescription' => array ('mark' => 5.0, 'maxmark'=> 15.0),
+            'élimination_des_déchets' => array ('mark' => 15.0, 'maxmark'=> 15.0),
+            'pharmacovigilance' => array ('mark' => 7.5, 'maxmark'=> 15.0),
+            'preparation_extemporannées' => array ('mark' => 15.0, 'maxmark'=> 0.0)
         );
         $cl = new \local_enva\course_list_by_score($user->id, $tag_scores);
         $courselist = $cl->get_list();
@@ -81,8 +81,8 @@ class local_enva_course_list_by_score_testcase extends \local_enva\quiz_test_bas
             'tc_5' => 0,
             'tc_4' => 0,
             'tc_3' => 0.75, // (1.0 + 0.5)/2
-            'tc_2' => 0.3, // 0.3
-            'tc_1' => 0.15, // (0.3+0)/2
+            'tc_2' => 1/3, // 0.3
+            'tc_1' => 1/6, // (0.3+0)/2
         );
         foreach($courselist as $c) {
             $this->assertTrue(

@@ -45,8 +45,8 @@ class local_enva_tag_scores_testcase extends \local_enva\quiz_test_base {
         $ts = new \local_enva\tag_scores($course->id, $user->id);
         $table = $ts->compute();
         $this->assertSame(array (
-            'délivrance' => 1.0,
-            'prescription' => 1.0,
+            'délivrance' => array ('mark' => 4.0, 'maxmark'=> 4.0),
+            'prescription' => array ('mark' => 4.0, 'maxmark'=> 4.0),
         ),$table);
     }
     
@@ -58,8 +58,8 @@ class local_enva_tag_scores_testcase extends \local_enva\quiz_test_base {
         $ts = new \local_enva\tag_scores($course->id, $user->id);
         $table = $ts->compute();
         $this->assertSame(array (
-            'délivrance' => 0.875,
-            'prescription' => 0.875,
+            'délivrance' => array ('mark' => 3.0, 'maxmark'=> 4.0),
+            'prescription' => array ('mark' => 3.0, 'maxmark'=> 4.0),
         ),$table);
     }
 
@@ -72,9 +72,9 @@ class local_enva_tag_scores_testcase extends \local_enva\quiz_test_base {
         $ts = new \local_enva\tag_scores($course->id, $user->id);
         $table = $ts->compute();
         $this->assertSame(array (
-            'délivrance' => 1.0,
-            'prescription' => 1.0,
-            'stupéfiant' => 1.0,
+            'délivrance' => array ('mark' => 15.0, 'maxmark'=> 15.0),
+            'prescription' => array ('mark' => 15.0, 'maxmark'=> 15.0),
+            'stupéfiant' => array ('mark' => 10.0, 'maxmark'=> 10.0),
         ),$table);
     }
     

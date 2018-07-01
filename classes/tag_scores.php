@@ -69,13 +69,17 @@ class tag_scores {
                 foreach ($quba->get_attempt_iterator() as $qa) {
                     $question = $qa->get_question();
                     $tagarray = \core_tag_tag::get_item_tags('core_question', 'question', $question->id);
+                    $qattempt = $quba->get_question_attempt($qa->get_slot());
                     $tag = reset($tagarray);
                     if ($tag) {
-                        $markpercent = $quba->get_question_fraction($qa->get_slot()); // Question fraction is REAL percentage
+                        $markpercent = $quba->get_question_fraction($qa->get_slot()); // Question fraction is the percentage for this question
+                        $maxmark =  $quba->get_question_max_mark($qa->get_slot());
+                        $mark =  $quba->get_question_mark($qa->get_slot());
                         if (!isset($tagtable[$tag->rawname])) {
-                            $tagtable[$tag->rawname] = $markpercent;
+                            $tagtable[$tag->rawname] = array('mark'=>$markpercent, 'maxmark'=>$maxmark);
                         } else {
-                            $tagtable[$tag->rawname] = ($tagtable[$tag->rawname] + $markpercent) / 2;
+                            $tagtable[$tag->rawname]['mark'] += $markpercent;
+                            $tagtable[$tag->rawname]['maxmark'] += $maxmark;
                         }
                     }
                 }
