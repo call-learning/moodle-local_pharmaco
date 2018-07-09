@@ -42,7 +42,7 @@ class user_registration {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    static public function register_to_test_course( \core\event\role_assigned $event ) {
+    static public function register_to_test_course_when_assigned( \core\event\role_assigned $event ) {
         global $DB;
         $eventdata = $event->get_record_snapshot('role_assignments', $event->other['id']);
         // Check if the assigned role is the external role, if not ignore the rest of the process
@@ -50,22 +50,31 @@ class user_registration {
         if ($externalroleid != $eventdata->roleid) {
             return;
         }
+        self::register_to_test_course($event->relateduserid);
+    }
+    /**
+     * If the user has been assigned to an external role, then register this user onto the test course
+     * @param \core\event\role_assigned $event
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    static public function register_to_test_course( $userid ) {
+        global $DB;
         // First, get the "selection"/quiz courseid
         $selcourseid = helper::get_test_course_id();
         if ( $selcourseid ) {
-            $isexternaluser = helper::is_user_external_role($event->relateduserid);
+            $isexternaluser = helper::is_user_external_role( $userid );
             if ($isexternaluser) {
-                global $CFG;
-                $context = \context_course::instance($selcourseid);
-                if ( !is_enrolled($context,$event->relateduserid) ) {
+                $context = \context_course::instance( $selcourseid );
+                if ( !is_enrolled($context,$userid) ) {
                     $studentroleid = $DB->get_field('role','id',array ('shortname' => 'student'));
                     // This is required for the completion module: the user should be a student
-                    enrol_try_internal_enrol($selcourseid, $event->relateduserid,$studentroleid);
+                    enrol_try_internal_enrol($selcourseid, $userid, $studentroleid);
                 }
             }
         }
+        
     }
-    
     /**
      * Register user to external courses (courses tagged with the external tag) if this user is an
      * external user
@@ -80,21 +89,5 @@ class user_registration {
             $extcourses = new \local_enva\external_courses(ENVA_EXTERNAL_COURSE_TAG_NAME);
             $extcourses->enrol_user_into_external_courses($userid);
         }
-    }
-    
-    /**
-     * Utility function to check if the provided user is an external user
-     * @param $userid
-     * @return bool
-     * @throws \dml_exception
-     */
-    static public function is_user_external_role($userid) {
-        $userroles = get_user_roles(\context_system::instance(), $userid);
-        foreach($userroles as $r) {
-            if ($r->shortname == ENVA_EXTERNAL_ROLE_SHORTNAME) {
-                return true;
-            }
-        }
-        return false;
     }
 }

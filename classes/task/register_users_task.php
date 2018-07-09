@@ -53,12 +53,9 @@ class register_users_task  extends \core\task\scheduled_task {
         // Then we make sure that each users in the external role is really
         // First, get the "selection"/quiz courseid
         $selcourseid = \local_enva\helper::get_test_course_id();
-        $context = \context_course::instance($selcourseid);
         
         foreach($userlist as $u) {
-            if ( !is_enrolled($context,$u->id) ) {
-                enrol_try_internal_enrol($selcourseid, $u->id);
-            }
+            \local_enva\user_registration::register_to_test_course($u->id);
             
             $ccompletion = new \completion_completion(array('course' => $selcourseid, 'userid' => $u->id));
             if ($ccompletion->is_complete()) {

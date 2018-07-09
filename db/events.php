@@ -13,6 +13,6 @@ $observers = array (
     ),
     array (
         'eventname' =>'\core\event\role_assigned',
-        'callback' => '\local_enva\user_registration::register_to_test_course',
+        'callback' => '\local_enva\user_registration::register_to_test_course_when_assigned',
     )
 );
