@@ -20,3 +20,6 @@ $string['setting:coursetocomplete_desc'] = 'Course to complete before, in order 
 // CRON
 
 $string['registerusersintest'] = 'Register users in test course';
+
+// ENVA Score page
+$string['envascores'] = 'Scores for ENVA';

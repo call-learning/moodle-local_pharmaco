@@ -21,3 +21,6 @@ destinés au personnes externes';
 // CRON
 
 $string['registerusersintest'] = 'Enregistre les utilisateurs externes dans le cours de pré-test';
+
+// ENVA Score page
+$string['envascores'] = 'Scores for ENVA';

@@ -22,6 +22,10 @@ if ($hassiteconfig) {
         '1'
     ));
     
+    $ADMIN->add('localplugins',
+        new admin_externalpage('envascores',get_string('envascores','local_enva'), "$CFG->wwwroot/local/enva/scores.php")
+    );
+    
     
 }
 
