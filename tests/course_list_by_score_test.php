@@ -66,11 +66,11 @@ class local_enva_course_list_by_score_testcase extends \local_enva\quiz_test_bas
         }
         
         $tag_scores = array(
-            'délivrance' => array ('mark' => 2.0, 'maxmark'=> 10.0),
-            'prescription' => array ('mark' => 5.0, 'maxmark'=> 15.0),
-            'élimination_des_déchets' => array ('mark' => 15.0, 'maxmark'=> 15.0),
-            'pharmacovigilance' => array ('mark' => 7.5, 'maxmark'=> 15.0),
-            'preparation_extemporannées' => array ('mark' => 15.0, 'maxmark'=> 0.0)
+            'délivrance' => array ('mark' => 2.0, 'coef'=> 10.0),
+            'prescription' => array ('mark' => 5.0, 'coef'=> 15.0),
+            'élimination_des_déchets' => array ('mark' => 15.0, 'coef'=> 15.0),
+            'pharmacovigilance' => array ('mark' => 7.5, 'coef'=> 15.0),
+            'preparation_extemporannées' => array ('mark' => 15.0, 'coef'=> 0.0)
         );
         $cl = new \local_enva\course_list_by_score($user->id, $tag_scores);
         $courselist = $cl->get_list();

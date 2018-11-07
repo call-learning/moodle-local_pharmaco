@@ -94,10 +94,10 @@ class course_list_by_score {
             foreach ($course->tags as $ctag) {
                 if (array_key_exists($ctag->rawname, $this->tagscorearray)) {
                     $tagscore = $this->tagscorearray[$ctag->rawname];
-                    if ($tagscore['maxmark'] == 0) {
+                    if ($tagscore['coef'] == 0) {
                         $markpercent = 0;
                     } else {
-                        $markpercent = $tagscore['mark'] / $tagscore['maxmark'];
+                        $markpercent = $tagscore['mark'] / $tagscore['coef'];
                     }
                     if ($score) {
                         $score = ($score + $markpercent )/2;

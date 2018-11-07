@@ -69,17 +69,24 @@ class tag_scores {
                 foreach ($quba->get_attempt_iterator() as $qa) {
                     $question = $qa->get_question();
                     $tagarray = \core_tag_tag::get_item_tags('core_question', 'question', $question->id);
-                    $qattempt = $quba->get_question_attempt($qa->get_slot());
                     $tag = reset($tagarray);
                     if ($tag) {
-                        $markpercent = $quba->get_question_fraction($qa->get_slot()); // Question fraction is the percentage for this question
-                        $maxmark =  $quba->get_question_max_mark($qa->get_slot());
-                        $mark =  $quba->get_question_mark($qa->get_slot());
+                        $markraw = $qa->get_fraction(); // Question fraction is the percentage for this question
+                        $coef =  $qa->get_max_mark();
+                        $mark =  $qa->get_mark();
+                        $certainty = $qa->get_last_behaviour_var('certainty');
+                        if ($certainty) {
+                            // We are sure now that we have a CBM question engine for this question, so we will have to make sure we
+                            // set the mark to a value between 0 and 1 (the range is -6 to 3)
+                            $minmark = $qa->get_min_fraction();
+                            $maxmark = $qa->get_max_fraction();
+                            $mark = ($markraw - $minmark)/($maxmark-$minmark);
+                        }
                         if (!isset($tagtable[$tag->rawname])) {
-                            $tagtable[$tag->rawname] = array('mark'=>$markpercent, 'maxmark'=>$maxmark);
+                            $tagtable[$tag->rawname] = array('mark'=>$mark, 'coef'=>$coef);
                         } else {
-                            $tagtable[$tag->rawname]['mark'] += $markpercent;
-                            $tagtable[$tag->rawname]['maxmark'] += $maxmark;
+                            $tagtable[$tag->rawname]['mark'] += $mark;
+                            $tagtable[$tag->rawname]['coef'] += $coef;
                         }
                     }
                 }
