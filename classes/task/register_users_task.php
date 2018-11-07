@@ -31,6 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 include_once($CFG->dirroot . '/local/enva/lib.php');
+include_once($CFG->dirroot . '/completion/completion_completion.php');
+
 /**
  * Cron Task to ensure users are registered to the selected test course in any case
  * (this is useful if we change for example the test course)
