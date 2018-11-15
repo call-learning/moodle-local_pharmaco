@@ -56,12 +56,6 @@ class tag_scores {
         $dm = new \question_engine_data_mapper();
         $tagtable = array();
         foreach($allquizzesmods as $qmod) {
-/*            $quizobj = \quiz::create($qmod->instance, $this->userid);
-            $quizobj->preload_questions();
-            $quizobj->load_questions();
-            $quba = new \question_usage_by_activity('mod_quiz',$quizobj->get_context());
-*/
-            //$qbaids = new \mod_quiz\question\qubaids_for_users_attempts($quizobj->get_quizid(),$this->userid);
             // For each question / slot get the tag + the score
             $qubas = $dm->load_questions_usages_by_activity(
                 new \mod_quiz\question\qubaids_for_users_attempts($qmod->instance, $this->userid));
@@ -69,24 +63,31 @@ class tag_scores {
                 foreach ($quba->get_attempt_iterator() as $qa) {
                     $question = $qa->get_question();
                     $tagarray = \core_tag_tag::get_item_tags('core_question', 'question', $question->id);
-                    $tag = reset($tagarray);
-                    if ($tag) {
-                        $markraw = $qa->get_fraction(); // Question fraction is the percentage for this question
-                        $coef =  $qa->get_max_mark();
+                    if (!empty($tagarray)) {
                         $mark =  $qa->get_mark();
+                        $markfract = $qa->get_fraction(); // Question fraction is the percentage for this question
+                        $coef =  $qa->get_max_mark(); // This is really the question weight, not the max, the max mark is
+                        // obtained using max_fraction/min_fraction
+                        
                         $certainty = $qa->get_last_behaviour_var('certainty');
                         if ($certainty) {
                             // We are sure now that we have a CBM question engine for this question, so we will have to make sure we
                             // set the mark to a value between 0 and 1 (the range is -6 to 3)
                             $minmark = $qa->get_min_fraction();
                             $maxmark = $qa->get_max_fraction();
-                            $mark = ($markraw - $minmark)/($maxmark-$minmark);
+                            $markfract = ($markfract - $minmark)/($maxmark-$minmark);
                         }
-                        if (!isset($tagtable[$tag->rawname])) {
-                            $tagtable[$tag->rawname] = array('mark'=>$mark, 'coef'=>$coef);
-                        } else {
-                            $tagtable[$tag->rawname]['mark'] += $mark;
-                            $tagtable[$tag->rawname]['coef'] += $coef;
+                        // For other types of questions, mark should be a float between 0 and 1
+                        
+                        // We then multiply the mark by the coef, so the total mark is mark/coef
+                        // We also do this for each tag
+                        foreach($tagarray as $tag) {
+                            if (!isset($tagtable[$tag->rawname])) {
+                                $tagtable[$tag->rawname] = array('mark' => $markfract * $coef, 'coef' => $coef);
+                            } else {
+                                $tagtable[$tag->rawname]['mark'] += $markfract * $coef;
+                                $tagtable[$tag->rawname]['coef'] += $coef;
+                            }
                         }
                     }
                 }

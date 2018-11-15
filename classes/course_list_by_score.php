@@ -89,24 +89,24 @@ class course_list_by_score {
          $course->tags = \core_tag_tag::get_item_tags('core','course',$course->id);
     }
     protected function compute_score(&$course) {
-        $score = 0;
+        $scorepercent  = 0;
+        
+        // We receive a tagscore array that is composed of mark weighed by its coef, and the total coef
+        // So the mean of this mark is mark/coef (will give a mark between 0 and 1)
         if (!empty($course->tags)) {
             foreach ($course->tags as $ctag) {
                 if (array_key_exists($ctag->rawname, $this->tagscorearray)) {
                     $tagscore = $this->tagscorearray[$ctag->rawname];
-                    if ($tagscore['coef'] == 0) {
-                        $markpercent = 0;
-                    } else {
-                        $markpercent = $tagscore['mark'] / $tagscore['coef'];
-                    }
-                    if ($score) {
-                        $score = ($score + $markpercent )/2;
-                    } else {
-                        $score = $markpercent;
+                    if ($tagscore['coef'] > 0) {
+                        if ($scorepercent == 0) {
+                            $scorepercent = $tagscore['mark'] / $tagscore['coef'];
+                        } else {
+                            $scorepercent = ($scorepercent + $tagscore['mark'] / $tagscore['coef']) / 2;
+                        }
                     }
                 }
             }
         }
-        $course->score = $score;
+        $course->score = $scorepercent;
     }
 }

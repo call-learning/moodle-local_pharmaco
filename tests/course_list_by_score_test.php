@@ -66,10 +66,10 @@ class local_enva_course_list_by_score_testcase extends \local_enva\quiz_test_bas
         }
         
         $tag_scores = array(
-            'délivrance' => array ('mark' => 2.0, 'coef'=> 10.0),
-            'prescription' => array ('mark' => 5.0, 'coef'=> 15.0),
-            'élimination_des_déchets' => array ('mark' => 15.0, 'coef'=> 15.0),
-            'pharmacovigilance' => array ('mark' => 7.5, 'coef'=> 15.0),
+            'délivrance' => array ('mark' => 1.0, 'coef'=> 1.0),
+            'prescription' => array ('mark' => 1.0, 'coef'=> 3.0),
+            'élimination_des_déchets' => array ('mark' => 2.0, 'coef'=> 2.0),
+            'pharmacovigilance' => array ('mark' => 2.0, 'coef'=> 4.0),
             'preparation_extemporannées' => array ('mark' => 15.0, 'coef'=> 0.0)
         );
         $cl = new \local_enva\course_list_by_score($user->id, $tag_scores);
@@ -81,8 +81,8 @@ class local_enva_course_list_by_score_testcase extends \local_enva\quiz_test_bas
             'tc_5' => 0,
             'tc_4' => 0,
             'tc_3' => 0.75, // (1.0 + 0.5)/2
-            'tc_2' => 1/3, // 0.3
-            'tc_1' => 1/6, // (0.3+0)/2
+            'tc_2' => 1/3, // 0.3 (external course does not count)
+            'tc_1' => 1/3, // 0.333 (we ignore the tag with coef 0)
         );
         foreach($courselist as $c) {
             $this->assertTrue(

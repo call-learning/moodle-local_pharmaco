@@ -35,7 +35,8 @@ echo $OUTPUT->container_start('content');
 
 $table = new html_table();
 foreach ($tagscores as $tname => $ts) {
-    $table->data[] = array ( $tname,"{$ts['mark']}/{$ts['coef']}");
+    $rawmean = $ts['mark']/$ts['coef'];
+    $table->data[] = array ( $tname,"{$ts['mark']}/{$ts['coef']}: {$rawmean}");
 }
 
 echo html_writer::table($table);
