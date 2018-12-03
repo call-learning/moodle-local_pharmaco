@@ -51,7 +51,7 @@ if ($options['help']) {
     cli_writeln($usage);
     exit(2);
 }
-$possiblefunctions = array('setup_dashboard_block');
+$possiblefunctions = array('setup_dashboard_block','enva_setups');
 
 if ($options['name'] === null) {
    $options['name'] = $possiblefunctions[0];
