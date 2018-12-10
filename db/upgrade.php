@@ -14,7 +14,7 @@ function xmldb_local_enva_upgrade($oldversion) {
     
     if ($oldversion < 2018062200) {
         $success = enva_setups();
-        upgrade_mod_savepoint(true, 2018062200, 'local_enva');
+        upgrade_plugin_savepoint(true, 2018062200, 'local','enva');
     }
     
     return $success;

@@ -23,7 +23,7 @@ if ($hassiteconfig) {
     ));
     
     $ADMIN->add('localplugins',
-        new admin_externalpage('envascores',get_string('envascores','local_enva'), "$CFG->wwwroot/local/enva/scores.php")
+        new admin_externalpage('envascores',get_string('envascores','local_enva'), "$CFG->wwwroot/local/enva/scores.php", 'moodle/site:config')
     );
     
     
