@@ -9,13 +9,19 @@
 function xmldb_local_enva_upgrade($oldversion) {
     global $CFG, $DB;
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
-    
+
     $success = true;
-    
+
     if ($oldversion < 2018062200) {
         $success = enva_setups();
         upgrade_plugin_savepoint(true, 2018062200, 'local','enva');
     }
-    
+
+
+    if ($oldversion < 2018062204) {
+        $success = enva_setups();
+        upgrade_plugin_savepoint(true, 2018062204, 'local','enva');
+    }
+
     return $success;
 }

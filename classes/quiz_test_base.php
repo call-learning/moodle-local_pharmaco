@@ -29,34 +29,31 @@ namespace local_enva;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-
-
 /**
  * This class contains the test cases for the tag_score class
  *
  */
 abstract class quiz_test_base extends \advanced_testcase {
     protected function create_tagged_courses_and_quizes($num_questions_per_quiz, $num_quizzes, $tagnames,$numberfailuresperquiz = 0 ) {
-    
+
         // Create a user
         $user = $this->getDataGenerator()->create_user();
-    
+
         // Create a course.
         $course = $this->getDataGenerator()->create_course();
-    
+
         // Enroll user in the course
         enrol_try_internal_enrol($course->id, $user->id);
         for($quizn = 0; $quizn < $num_quizzes; $quizn++) {
             $this->create_tagged_quizzes($num_questions_per_quiz, $tagnames, $user, $course,$numberfailuresperquiz);
         }
-       
+
         return array($user,$course);
     }
     protected function create_tagged_quizzes($num_questions_per_quiz, $tagnames, $user, $course, $numberfailuresperquiz = 0 ) {
         $timenow = time(); // Update time now, in case the server is running really slowly.
         // Create the quizzes
-    
+
         $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
         $quiz = $quizgenerator->create_instance(array('course' => $course->id, 'questionsperpage' => 0,
             'grade' => 100.0, 'sumgrades' => 2, 'preferredbehaviour' => 'immediatefeedback'));
@@ -68,7 +65,7 @@ abstract class quiz_test_base extends \advanced_testcase {
         for ($i = 0; $i < $num_questions_per_quiz ; $i++) {
             $sa = $generator->create_question('shortanswer', null, array('category' => $cat->id));
             $tagname =  $tagnames[$i % count($tagnames)];
-            
+
             // Add the tag to the question
             \core_tag_tag::add_item_tag('core_question', 'question', $sa->id,
                 \context::instance_by_id($cat->contextid), $tagname);
@@ -80,7 +77,7 @@ abstract class quiz_test_base extends \advanced_testcase {
         $quizobj = new \quiz($quiz, $cm, $course);
         $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
-    
+
         // Create and save the quiz attempt
         $quizattempt = quiz_create_attempt($quizobj, 1, null, $timenow, false, $user->id);
         $quizattempt = quiz_start_new_attempt($quizobj, $quba, $quizattempt, 1, $timenow);
@@ -100,6 +97,6 @@ abstract class quiz_test_base extends \advanced_testcase {
         $quizattemptobj->process_submitted_actions($timenow + 300, false, $slottableresponses);
         $quizattemptobj->process_finish($timenow + 600, false);
         $quizattemptobj->process_finish($timenow, false); // Save quiz + question states
-    
+
     }
 }

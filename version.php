@@ -9,7 +9,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018062202;
+$plugin->version   = 2018062204;
 $plugin->requires  =  2017051503.08;
 $plugin->cron      = 0;
 $plugin->component = 'local_enva';
