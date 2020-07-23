@@ -15,44 +15,72 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for the tag score class which build an array of scores
- * for each tag on a given course
+ * Utilities for tests and the tag score
  *
- * @package   local_enva
- * @category  phpunit
- * @copyright 2018, CALL Learning SAS
+ * class which build an array of scores for each tag on a given course
+ *
+ * @package   local_pharmaco
+ * @copyright 2018-2020, SAS CALL Learning
  * @author Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_enva;
+namespace local_pharmaco;
+
+use advanced_testcase;
+use context;
+use core_tag_tag;
+use question_engine;
+use quiz;
+use quiz_attempt;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * This class contains the test cases for the tag_score class
  *
+ * @copyright 2018-2020, SAS CALL Learning
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class quiz_test_base extends \advanced_testcase {
-    protected function create_tagged_courses_and_quizes($num_questions_per_quiz, $num_quizzes, $tagnames,$numberfailuresperquiz = 0 ) {
+abstract class quiz_test_base extends advanced_testcase {
+    /**
+     * @param int $numquestionsperquiz
+     * @param int $numquizzes
+     * @param array $tagnames
+     * @param int $numberfailuresperquiz
+     * @return array
+     */
+    protected function create_tagged_courses_and_quizes($numquestionsperquiz, $numquizzes, $tagnames,
+        $numberfailuresperquiz = 0) {
 
-        // Create a user
+        // Create a user.
         $user = $this->getDataGenerator()->create_user();
 
         // Create a course.
         $course = $this->getDataGenerator()->create_course();
 
-        // Enroll user in the course
+        // Enroll user in the course.
         enrol_try_internal_enrol($course->id, $user->id);
-        for($quizn = 0; $quizn < $num_quizzes; $quizn++) {
-            $this->create_tagged_quizzes($num_questions_per_quiz, $tagnames, $user, $course,$numberfailuresperquiz);
+        for ($quizn = 0; $quizn < $numquizzes; $quizn++) {
+            $this->create_tagged_quizzes($numquestionsperquiz, $tagnames, $user, $course, $numberfailuresperquiz);
         }
 
-        return array($user,$course);
+        return array($user, $course);
     }
-    protected function create_tagged_quizzes($num_questions_per_quiz, $tagnames, $user, $course, $numberfailuresperquiz = 0 ) {
+
+    /**
+     * @param int $numquestionsperquiz
+     * @param array $tagnames
+     * @param object $user
+     * @param object $course
+     * @param int $numberfailuresperquiz
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
+    protected function create_tagged_quizzes($numquestionsperquiz, $tagnames, $user, $course, $numberfailuresperquiz = 0) {
         $timenow = time(); // Update time now, in case the server is running really slowly.
-        // Create the quizzes
+        // Create the quizzes.
 
         $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
         $quiz = $quizgenerator->create_instance(array('course' => $course->id, 'questionsperpage' => 0,
@@ -62,41 +90,41 @@ abstract class quiz_test_base extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $cat = $generator->create_question_category();
         $questions = array();
-        for ($i = 0; $i < $num_questions_per_quiz ; $i++) {
+        for ($i = 0; $i < $numquestionsperquiz; $i++) {
             $sa = $generator->create_question('shortanswer', null, array('category' => $cat->id));
-            $tagname =  $tagnames[$i % count($tagnames)];
+            $tagname = $tagnames[$i % count($tagnames)];
 
-            // Add the tag to the question
-            \core_tag_tag::add_item_tag('core_question', 'question', $sa->id,
-                \context::instance_by_id($cat->contextid), $tagname);
+            // Add the tag to the question.
+            core_tag_tag::add_item_tag('core_question', 'question', $sa->id,
+                context::instance_by_id($cat->contextid), $tagname);
             $questions[] = $sa;
-            // Add the question to the quiz
+            // Add the question to the quiz.
             quiz_add_quiz_question($sa->id, $quiz);
         }
         /* Create the helper objects */
-        $quizobj = new \quiz($quiz, $cm, $course);
-        $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+        $quizobj = new quiz($quiz, $cm, $course);
+        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
-        // Create and save the quiz attempt
+        // Create and save the quiz attempt.
         $quizattempt = quiz_create_attempt($quizobj, 1, null, $timenow, false, $user->id);
         $quizattempt = quiz_start_new_attempt($quizobj, $quba, $quizattempt, 1, $timenow);
-        $quizattempt = quiz_attempt_save_started($quizobj, $quba, $quizattempt); // Save attempt and get a unique id
-        // Answer all questions right
-        $quizattemptobj = \quiz_attempt::create($quizattempt->id);
+        $quizattempt = quiz_attempt_save_started($quizobj, $quba, $quizattempt); // Save attempt and get a unique id.
+        // Answer all questions right.
+        $quizattemptobj = quiz_attempt::create($quizattempt->id);
         $slottableresponses = [];
         foreach ($quba->get_slots() as $slot) {
             $correctresponse = $quba->get_correct_response($slot);
-            if ($numberfailuresperquiz>0) {
-                $numberfailuresperquiz --;
-                $slottableresponses[$slot] = array('answer'=>'incorrectresponse');
+            if ($numberfailuresperquiz > 0) {
+                $numberfailuresperquiz--;
+                $slottableresponses[$slot] = array('answer' => 'incorrectresponse');
             } else {
                 $slottableresponses[$slot] = $correctresponse;
             }
         }
         $quizattemptobj->process_submitted_actions($timenow + 300, false, $slottableresponses);
         $quizattemptobj->process_finish($timenow + 600, false);
-        $quizattemptobj->process_finish($timenow, false); // Save quiz + question states
+        $quizattemptobj->process_finish($timenow, false); // Save quiz + question states.
 
     }
 }

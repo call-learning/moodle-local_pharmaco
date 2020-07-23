@@ -14,21 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- * Version
+ * Language EN
  *
  * @package   local_pharmaco
  * @copyright 2018-2020, SAS CALL Learning
  * @author Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['pluginname'] = 'PHARMACO Local Plugin';
 
-defined('MOODLE_INTERNAL') || die();
+$string['pharmacoexternalrole_name'] = 'PHARMACO External Role';
+$string['pharmacoexternalrole_desc'] = 'PHARMACO External Role, used mainly to decide if a user has to pass the main quiz
+before starting';
 
-$plugin->version = 2018062204;
-$plugin->requires = 2017051503.08;
-$plugin->cron = 0;
-$plugin->component = 'local_pharmaco';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.0';
+// Settings string.
+$string['pharmacosettings'] = 'PHARMACO Settings';
+$string['setting:coursetocomplete'] = 'Course to complete';
+$string['setting:coursetocomplete_desc'] = 'Course to complete before, in order to be registered to all external courses';
 
-$plugin->dependencies = array();
+// CRON.
+
+$string['registerusersintest'] = 'Register users in test course';
+
+// PHARMACO Score page.
+$string['pharmacoscores'] = 'Scores for PHARMACO';

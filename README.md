@@ -1,17 +1,19 @@
-INTRODUCTION
+## INTRODUCTION
 
-This plugin encapsulates overrides for the ENVA Moodle Project
+https://travis-ci.org/call-learning/moodle-local_pharmaco.svg?branch=master
 
-HOW TO SETUP
+This plugin encapsulates overrides for the PHARMACO Moodle Project
+
+## HOW TO SETUP
 
 
 To be able to use this module you need first to install it using the usual Moodle admin install procedure (https://docs.moodle.org/28/en/Installing_plugins)
 We use here the customsscript moodle setting (https://docs.moodle.org/dev/customscripts).
 So to be able to override the view mechanisms of the quiz, you need to add the following line in your config.php file:
 
-  $CFG->customscripts = dirname(__FILE__). '/local/enva/customscripts/';
+  $CFG->customscripts = dirname(__FILE__). '/local/pharmaco/customscripts/';
 
-WHAT TO EXPECT
+## WHAT TO EXPECT
 
 This plugin manages the following workflow for a subset of users (External users):
 - Allow to select a course as a test course
@@ -21,6 +23,6 @@ This plugin manages the following workflow for a subset of users (External users
 
 External users have the External User role assigned to them. It is a usual student role but it flags this user as an external user.
 
-TROUBLESHOOTING
+## TROUBLESHOOTING
 
 tbd

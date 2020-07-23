@@ -13,6 +13,14 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * CLI for testing
+ *
+ * @package   local_pharmaco
+ * @copyright 2018-2020, SAS CALL Learning
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 /**
  * CLI script allowing to run internal/ setup functions multiple times
@@ -20,9 +28,9 @@
 
 define('CLI_SCRIPT', true);
 
-require(__DIR__.'/../../../config.php');
-require_once($CFG->libdir.'/clilib.php');
-require_once($CFG->dirroot.'/local/enva/locallib.php');
+require(__DIR__ . '/../../../config.php');
+require_once($CFG->libdir . '/clilib.php');
+require_once($CFG->dirroot . '/local/pharmaco/locallib.php');
 
 $usage = "Run different setup script for testing purpose
 
@@ -43,7 +51,7 @@ list($options, $unrecognised) = cli_get_params([
 ]);
 
 if ($unrecognised) {
-    $unrecognised = implode(PHP_EOL.'  ', $unrecognised);
+    $unrecognised = implode(PHP_EOL . '  ', $unrecognised);
     cli_error(get_string('cliunknowoption', 'core_admin', $unrecognised));
 }
 
@@ -51,12 +59,12 @@ if ($options['help']) {
     cli_writeln($usage);
     exit(2);
 }
-$possiblefunctions = array('setup_dashboard_block','enva_setups');
+$possiblefunctions = array('setup_dashboard_block', 'pharmaco_setups');
 
 if ($options['name'] === null) {
-   $options['name'] = $possiblefunctions[0];
+    $options['name'] = $possiblefunctions[0];
 }
 
-if ( in_array($options['name'],$possiblefunctions) ) {
+if (in_array($options['name'], $possiblefunctions)) {
     call_user_func($options['name']);
 }

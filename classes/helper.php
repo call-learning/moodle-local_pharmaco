@@ -1,49 +1,76 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- * @package   local_enva
- * @copyright 2018, CALL Learning SAS
+ * @package   local_pharmaco
+ * @copyright 2018-2020, SAS CALL Learning
  * @author Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_enva;
+namespace local_pharmaco;
+
+use context_system;
+use dml_exception;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-include_once($CFG->dirroot . '/local/enva/lib.php');
+require_once($CFG->dirroot . '/local/pharmaco/lib.php');
 
+/**
+ * Helper class.
+ *
+ * @copyright 2018-2020, SAS CALL Learning
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class helper {
     /**
      * Utility function to check if the provided user is an external user
+     *
      * @param $userid
      * @return bool
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     static public function is_user_external_role($userid) {
-        $userroles = get_user_roles(\context_system::instance(), $userid);
+        $userroles = get_user_roles(context_system::instance(), $userid);
         foreach ($userroles as $r) {
-            if ($r->shortname == ENVA_EXTERNAL_ROLE_SHORTNAME) {
+            if ($r->shortname == PHARMACO_EXTERNAL_ROLE_SHORTNAME) {
                 return true;
             }
         }
         return false;
     }
-    
+
     /**
      * Get test course identifier as setup in the plugin settings
      */
     static public function get_test_course_id() {
-        return get_config('local_enva', 'coursetocomplete');
+        return get_config('local_pharmaco', 'coursetocomplete');
     }
-    
+
     static public function get_external_course_tag_name() {
-        return ENVA_EXTERNAL_COURSE_TAG_NAME;
+        return PHARMACO_EXTERNAL_COURSE_TAG_NAME;
     }
-    
+
     /**
      * Remove accents
      * This is directly from wordpress https://raw.githubusercontent.com/WordPress/WordPress/master/wp-includes/formatting.php
      * We could have used Transliterator library but did not want the dependance
+     *
      * @param string $string Text that might have accent characters
      * @return string Filtered string with replaced "nice" characters.
      */
@@ -51,9 +78,9 @@ class helper {
         if (!preg_match('/[\x80-\xff]/', $string)) {
             return $string;
         }
-        
+
         $chars = array(
-            // Decompositions for Latin-1 Supplement
+            // Decompositions for Latin-1 Supplement.
             'ª' => 'a',
             'º' => 'o',
             'À' => 'A',
@@ -118,7 +145,7 @@ class helper {
             'þ' => 'th',
             'ÿ' => 'y',
             'Ø' => 'O',
-            // Decompositions for Latin Extended-A
+            // Decompositions for Latin Extended-A.
             'Ā' => 'A',
             'ā' => 'a',
             'Ă' => 'A',
@@ -247,22 +274,22 @@ class helper {
             'Ž' => 'Z',
             'ž' => 'z',
             'ſ' => 's',
-            // Decompositions for Latin Extended-B
+            // Decompositions for Latin Extended-B.
             'Ș' => 'S',
             'ș' => 's',
             'Ț' => 'T',
             'ț' => 't',
-            // Euro Sign
+            // Euro Sign.
             '€' => 'E',
-            // GBP (Pound) Sign
+            // GBP (Pound) Sign.
             '£' => '',
-            // Vowels with diacritic (Vietnamese)
-            // unmarked
+            // Vowels with diacritic (Vietnamese).
+            // unmarked.
             'Ơ' => 'O',
             'ơ' => 'o',
             'Ư' => 'U',
             'ư' => 'u',
-            // grave accent
+            // Grave accent.
             'Ầ' => 'A',
             'ầ' => 'a',
             'Ằ' => 'A',
@@ -277,7 +304,7 @@ class helper {
             'ừ' => 'u',
             'Ỳ' => 'Y',
             'ỳ' => 'y',
-            // hook
+            // Hook.
             'Ả' => 'A',
             'ả' => 'a',
             'Ẩ' => 'A',
@@ -302,7 +329,7 @@ class helper {
             'ử' => 'u',
             'Ỷ' => 'Y',
             'ỷ' => 'y',
-            // tilde
+            // Tilde.
             'Ẫ' => 'A',
             'ẫ' => 'a',
             'Ẵ' => 'A',
@@ -319,7 +346,7 @@ class helper {
             'ữ' => 'u',
             'Ỹ' => 'Y',
             'ỹ' => 'y',
-            // acute accent
+            // Acute accent.
             'Ấ' => 'A',
             'ấ' => 'a',
             'Ắ' => 'A',
@@ -332,7 +359,7 @@ class helper {
             'ớ' => 'o',
             'Ứ' => 'U',
             'ứ' => 'u',
-            // dot below
+            // Dot below.
             'Ạ' => 'A',
             'ạ' => 'a',
             'Ậ' => 'A',
@@ -357,15 +384,15 @@ class helper {
             'ự' => 'u',
             'Ỵ' => 'Y',
             'ỵ' => 'y',
-            // Vowels with diacritic (Chinese, Hanyu Pinyin)
+            // Vowels with diacritic (Chinese, Hanyu Pinyin).
             'ɑ' => 'a',
-            // macron
+            // Macron.
             'Ǖ' => 'U',
             'ǖ' => 'u',
-            // acute accent
+            // Acute accent.
             'Ǘ' => 'U',
             'ǘ' => 'u',
-            // caron
+            // Caron.
             'Ǎ' => 'A',
             'ǎ' => 'a',
             'Ǐ' => 'I',
@@ -376,15 +403,14 @@ class helper {
             'ǔ' => 'u',
             'Ǚ' => 'U',
             'ǚ' => 'u',
-            // grave accent
+            // Grave accent.
             'Ǜ' => 'U',
             'ǜ' => 'u',
         );
-        
-        
+
         $string = strtr($string, $chars);
-        
+
         return $string;
     }
-    
+
 }

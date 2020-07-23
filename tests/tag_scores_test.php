@@ -18,13 +18,14 @@
  * Unit tests for the tag score class which build an array of scores
  * for each tag on a given course
  *
- * @package   local_enva
- * @category  phpunit
- * @copyright 2018, CALL Learning SAS
+ * @package   local_pharmaco
+ * @copyright 2018-2020, SAS CALL Learning
  * @author Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_pharmaco\quiz_test_base;
+use local_pharmaco\tag_scores;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -33,65 +34,67 @@ global $CFG;
 /**
  * This class contains the test cases for the tag_score class
  *
+ * @copyright 2018-2020, SAS CALL Learning
+ * @author Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_enva_tag_scores_testcase extends \local_enva\quiz_test_base {
-    
-    
+class local_pharmaco_tag_scores_testcase extends quiz_test_base {
+
     public function test_tagged_simple_quiz_results() {
-        // We assume we have one course and one user
+        // We assume we have one course and one user.
         $this->resetAfterTest();
         list ($user, $course) =
-            $this->create_tagged_courses_and_quizes(8,1,array('délivrance','prescription'));
-        $ts = new \local_enva\tag_scores($course->id, $user->id);
+            $this->create_tagged_courses_and_quizes(8, 1, array('délivrance', 'prescription'));
+        $ts = new tag_scores($course->id, $user->id);
         $table = $ts->compute();
-        $this->assertSame(array (
-            'délivrance' => array ('mark' => 4.0, 'coef'=> 4.0),
-            'prescription' => array ('mark' => 4.0, 'coef'=> 4.0),
-        ),$table);
-    }
-    
-    public function test_tagged_simple_quiz_results_with_failures() {
-        // We assume we have one course and one user
-        $this->resetAfterTest();
-        list ($user, $course) =
-            $this->create_tagged_courses_and_quizes(8,1,array('délivrance','prescription'),2);
-        $ts = new \local_enva\tag_scores($course->id, $user->id);
-        $table = $ts->compute();
-        $this->assertSame(array (
-            'délivrance' => array ('mark' => 3.0, 'coef'=> 4.0),
-            'prescription' => array ('mark' => 3.0, 'coef'=> 4.0),
-        ),$table);
+        $this->assertSame(array(
+            'délivrance' => array('mark' => 4.0, 'coef' => 4.0),
+            'prescription' => array('mark' => 4.0, 'coef' => 4.0),
+        ), $table);
     }
 
-    
-    public function test_tagged_several_quiz_results() {
-        // We assume we have one course and one user
-        $this->resetAfterTest();
-        list ($user, $course) =
-            $this->create_tagged_courses_and_quizes(8,5,array('délivrance','prescription', 'stupéfiant'));
-        $ts = new \local_enva\tag_scores($course->id, $user->id);
-        $table = $ts->compute();
-        $this->assertSame(array (
-            'délivrance' => array ('mark' => 15.0, 'coef'=> 15.0),
-            'prescription' => array ('mark' => 15.0, 'coef'=> 15.0),
-            'stupéfiant' => array ('mark' => 10.0, 'coef'=> 10.0),
-        ),$table);
-    }
-    
-    protected function create_tagged_courses_and_quizes($num_questions_per_quiz, $num_quizzes, $tagnames,$numberfailuresperquiz = 0 ) {
-    
-        // Create a user
+    protected function create_tagged_courses_and_quizes($numquestionsperquiz, $numquizzes, $tagnames,
+        $numberfailuresperquiz = 0) {
+
+        // Create a user.
         $user = $this->getDataGenerator()->create_user();
-    
+
         // Create a course.
         $course = $this->getDataGenerator()->create_course();
-    
-        // Enroll user in the course
+
+        // Enroll user in the course.
         enrol_try_internal_enrol($course->id, $user->id);
-        for($quizn = 0; $quizn < $num_quizzes; $quizn++) {
-            $this->create_tagged_quizzes($num_questions_per_quiz, $tagnames, $user, $course,$numberfailuresperquiz);
+        for ($quizn = 0; $quizn < $numquizzes; $quizn++) {
+            $this->create_tagged_quizzes($numquestionsperquiz, $tagnames, $user, $course, $numberfailuresperquiz);
         }
-       
-        return array($user,$course);
+
+        return array($user, $course);
+    }
+
+    public function test_tagged_simple_quiz_results_with_failures() {
+        // We assume we have one course and one user.
+        $this->resetAfterTest();
+        list ($user, $course) =
+            $this->create_tagged_courses_and_quizes(8, 1, array('délivrance', 'prescription'), 2);
+        $ts = new tag_scores($course->id, $user->id);
+        $table = $ts->compute();
+        $this->assertSame(array(
+            'délivrance' => array('mark' => 3.0, 'coef' => 4.0),
+            'prescription' => array('mark' => 3.0, 'coef' => 4.0),
+        ), $table);
+    }
+
+    public function test_tagged_several_quiz_results() {
+        // We assume we have one course and one user.
+        $this->resetAfterTest();
+        list ($user, $course) =
+            $this->create_tagged_courses_and_quizes(8, 5, array('délivrance', 'prescription', 'stupéfiant'));
+        $ts = new tag_scores($course->id, $user->id);
+        $table = $ts->compute();
+        $this->assertSame(array(
+            'délivrance' => array('mark' => 15.0, 'coef' => 15.0),
+            'prescription' => array('mark' => 15.0, 'coef' => 15.0),
+            'stupéfiant' => array('mark' => 10.0, 'coef' => 10.0),
+        ), $table);
     }
 }
