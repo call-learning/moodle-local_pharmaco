@@ -27,7 +27,7 @@ $tasks = array(
     array(
         'classname' => 'local_pharmaco\task\register_users_task',
         'blocking' => 0,
-        'minute' => '*/10',
+        'minute' => '*',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',

@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018062204;
-$plugin->requires = 2017051503.08;
+$plugin->version = 2020072301;
+$plugin->requires = 2019111804.00;
 $plugin->cron = 0;
 $plugin->component = 'local_pharmaco';
 $plugin->maturity = MATURITY_STABLE;
