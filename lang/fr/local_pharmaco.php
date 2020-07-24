@@ -21,14 +21,14 @@
  * @author Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'PHARMACO Plugin local';
+$string['pluginname'] = 'Pharmacie Local';
 
-$string['pharmacoexternalrole_name'] = 'PHARMACO Rôle Externe';
-$string['pharmacoexternalrole_desc'] = 'PHARMACO Rôle Externe, utilisé principalement pour décider si un utilisateur doit passer
+$string['pharmacoexternalrole_name'] = 'Pharmacie Rôle Externe';
+$string['pharmacoexternalrole_desc'] = 'Pharmacie Rôle Externe, utilisé principalement pour décider si un utilisateur doit passer
 un examen avant de démarrer les cours';
 
 // Settings string.
-$string['pharmacosettings'] = 'Paramètres PHARMACO';
+$string['pharmacosettings'] = 'Paramètres Pharmacie';
 $string['setting:coursetocomplete'] = 'Cours à compléter';
 $string['setting:coursetocomplete_desc'] = 'Cours à compléter à priori, de manière à être inscrit tous les cours
 destinés au personnes externes';
@@ -38,4 +38,4 @@ destinés au personnes externes';
 $string['registerusersintest'] = 'Enregistre les utilisateurs externes dans le cours de pré-test';
 
 // PHARMACO Score page.
-$string['pharmacoscores'] = 'Scores for PHARMACO';
+$string['pharmacoscores'] = 'Scores for Pharmacie';
