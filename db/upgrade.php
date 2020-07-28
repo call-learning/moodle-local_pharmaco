@@ -33,6 +33,7 @@ defined('MOODLE_INTERNAL') || die;
  */
 function xmldb_local_pharmaco_upgrade($oldversion) {
     global $CFG, $DB;
+    require_once($CFG->dirroot . '/local/pharmaco/locallib.php');
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
     $success = true;
@@ -45,6 +46,11 @@ function xmldb_local_pharmaco_upgrade($oldversion) {
     if ($oldversion < 2018062204) {
         $success = pharmaco_setups();
         upgrade_plugin_savepoint(true, 2018062204, 'local', 'pharmaco');
+    }
+
+    if ($oldversion < 2020072305) {
+        $success = pharmaco_setups();
+        upgrade_plugin_savepoint(true, 2020072305, 'local', 'pharmaco');
     }
 
     return $success;

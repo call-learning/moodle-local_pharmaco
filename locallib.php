@@ -105,6 +105,7 @@ function setup_dashboard_block() {
     $defaultmypage->set_pagetype('my-index');
     $defaultmypage->set_subpage($defaultmy->id);
     $defaultmypage->set_url(new moodle_url('/'));
+    $defaultmypage->set_context(context_system::instance());
 
     $defaultmybm = $defaultmypage->blocks;
     $defaultmybm->add_regions(array($rname), false);

@@ -23,7 +23,6 @@
  */
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
-require_once($CFG->dirroot . '/local/pharmaco/locallib.php');
 
 /**
  * Installation for pharmaco script
@@ -34,7 +33,7 @@ require_once($CFG->dirroot . '/local/pharmaco/locallib.php');
  */
 function xmldb_local_pharmaco_install() {
     global $CFG, $DB, $SITE;
-
+    require_once($CFG->dirroot . '/local/pharmaco/locallib.php');
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
     $success = true;
     $success = pharmaco_setups();
